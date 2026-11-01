@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import GameScene from "./scenes/game";
 import MainMenu from "./scenes/mainmenu";
+import LevelScene from "./scenes/level";
 
 const config = {
     type: Phaser.AUTO,
@@ -20,8 +21,9 @@ const config = {
     pixelArt: true,
     scene: [
         MainMenu,
+        LevelScene,
         GameScene
     ]
 };
 
-export default config
+export default config;
