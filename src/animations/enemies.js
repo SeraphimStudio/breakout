@@ -33,7 +33,7 @@ export default function createEnemyAnims(anims) {
     });
     anims.create({
         key: "enemy3_run",
-        frames: anims.generateFrameNumbers("enemy3_walk", { start: 0, end: 6 }),
+        frames: anims.generateFrameNumbers("enemy3_walk", { start: 0, end: 5 }),
         frameRate: 12,
         repeat: -1
     });
@@ -51,19 +51,19 @@ export default function createEnemyAnims(anims) {
     });
     anims.create({
         key: "enemy1_special",
-        frames: anims.generateFrameNumbers("enemy1_special", { start: 0, end: 6 }),
+        frames: anims.generateFrameNumbers("enemy1_special", { start: 0, end: 5 }),
         frameRate: 12,
         repeat: -1
     });
     anims.create({
         key: "enemy2_special",
-        frames: anims.generateFrameNumbers("enemy2_special", { start: 0, end: 6 }),
+        frames: anims.generateFrameNumbers("enemy2_special", { start: 0, end: 5 }),
         frameRate: 12,
         repeat: -1
     });
     anims.create({
         key: "enemy3_special",
-        frames: anims.generateFrameNumbers("enemy3_special", { start: 0, end: 6 }),
+        frames: anims.generateFrameNumbers("enemy3_special", { start: 0, end: 5 }),
         frameRate: 12,
         repeat: -1
     });

@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import createPlayerAnimations from "../animations/player";
+import createEnemyAnims from "../animations/enemies";
 
 export default class MainMenu extends Phaser.Scene {
 
@@ -29,6 +30,7 @@ export default class MainMenu extends Phaser.Scene {
     }
     create() {
         createPlayerAnimations(this.anims);
+        createEnemyAnims(this.anims);
         this.scene.start("GameScene");
     }
 
