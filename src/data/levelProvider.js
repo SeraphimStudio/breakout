@@ -24,7 +24,7 @@ export const LEVELS = [
         id: 3,
         title: "Level 3",
         name: "Rooftop Run",
-        mapKey: "map",
+        mapKey: "map3",
         description: "High alert sector with tight patrol coordination.",
         difficulty: "Expert",
         stars: 3
@@ -33,7 +33,7 @@ export const LEVELS = [
         id: 4,
         title: "Level 4",
         name: "Shadow Fortress",
-        mapKey: "map",
+        mapKey: "map4",
         description: "Complex waypoints requiring precise evasion timing.",
         difficulty: "Master",
         stars: 3

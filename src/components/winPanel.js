@@ -1,19 +1,7 @@
 import Phaser from "phaser";
 import LevelBtn from "./levelBtn";
 
-
 export default class WinPanel extends Phaser.GameObjects.Container {
-    /**
-     * @param {Phaser.Scene} scene 
-     * @param {object} options 
-     * @param {number} [options.level=1] 
-     * @param {number} [options.starsCollected=0] 
-     * @param {number} [options.totalStars=3] 
-     * @param {Function} [options.onNextLevel] 
-     * @param {Function} [options.onReplay] 
-     * @param {Function} [options.onLevelSelect] 
-     * @param {Function} [options.onMainMenu] 
-     */
     constructor(scene, options = {}) {
         const cx = scene.cameras.main.width / 2;
         const cy = scene.cameras.main.height / 2;
@@ -39,7 +27,7 @@ export default class WinPanel extends Phaser.GameObjects.Container {
         const winHeight = 195;
 
         const shadow = scene.add.graphics();
-        shadow.fillStyle(0x000000, 0.5);
+        shadow.fillStyle(0x000000, 1);
         shadow.fillRoundedRect(cx - winWidth / 2, cy - winHeight / 2 + 4, winWidth, winHeight, 8);
         shadow.setScrollFactor(0);
         this.add(shadow);
@@ -58,7 +46,7 @@ export default class WinPanel extends Phaser.GameObjects.Container {
             fontStyle: "bold",
             color: "#34d399"
         }).setOrigin(0.5, 0.5).setScrollFactor(0);
-        title.setShadow(0, 2, "#065f46", 4, true, true);
+        title.setShadow(2, 2, "#000000", 0);
         this.add(title);
 
         const subtitle = scene.add.text(cx, cy - 44, `Sector ${this.level} Infiltration Clear • Flag Secured`, {
@@ -89,7 +77,7 @@ export default class WinPanel extends Phaser.GameObjects.Container {
             }).setOrigin(0.5, 0.5).setScrollFactor(0);
 
             if (isEarned) {
-                starText.setShadow(0, 0, "#f59e0b", 8, true, true);
+                starText.setShadow(1, 1, "#000000", 0);
             }
             this.add(starText);
         }
@@ -103,7 +91,7 @@ export default class WinPanel extends Phaser.GameObjects.Container {
 
         const buttonY = cy + 58;
 
-        const hasNext = this.level < 5;
+        const hasNext = this.level < 4;
         const nextBtnText = hasNext ? "Next Level" : "All Clear";
         const nextBtn = new LevelBtn(scene, cx - 100, buttonY, nextBtnText, () => {
             if (typeof options.onNextLevel === "function") {
@@ -164,4 +152,3 @@ export default class WinPanel extends Phaser.GameObjects.Container {
         });
     }
 }
-

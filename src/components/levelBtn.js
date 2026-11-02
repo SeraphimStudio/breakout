@@ -31,7 +31,7 @@ export default class LevelBtn extends Phaser.GameObjects.Container {
         this.disabledStrokeColor = options.disabledStrokeColor !== undefined ? options.disabledStrokeColor : 0x475569;
 
         this.shadowEnabled = options.shadow !== undefined ? options.shadow : true;
-        this.shadowOffset = options.shadowOffset || 3;
+        this.shadowOffset = options.shadowOffset !== undefined ? options.shadowOffset : 3;
 
         this.isHovered = false;
         this.isPressed = false;
@@ -42,27 +42,15 @@ export default class LevelBtn extends Phaser.GameObjects.Container {
         this.bg = scene.add.graphics();
         this.add(this.bg);
 
-        const textY = options.subtitle ? -6 : 0;
-        this.label = scene.add.text(0, textY, this.btnText, {
+        this.label = scene.add.text(0, 0, this.btnText, {
             fontSize: this.fontSize,
             fontFamily: this.fontFamily,
             fontStyle: this.fontWeight,
             color: this.disabled ? this.disabledTextColor : this.textColor,
             align: "center"
         }).setOrigin(0.5, 0.5);
-        this.label.setShadow(1, 1, "#000000", 2, true, true);
+        this.label.setShadow(1, 1, "#000000", 0);
         this.add(this.label);
-
-        if (options.subtitle) {
-            this.sublabel = scene.add.text(0, 9, options.subtitle, {
-                fontSize: options.subFontSize || "9px",
-                fontFamily: this.fontFamily,
-                fontStyle: "normal",
-                color: options.subColor || "#94a3b8",
-                align: "center"
-            }).setOrigin(0.5, 0.5);
-            this.add(this.sublabel);
-        }
 
         this.hitZone = scene.add.zone(0, 0, this.btnWidth, this.btnHeight).setOrigin(0.5, 0.5);
         this.add(this.hitZone);
@@ -81,7 +69,7 @@ export default class LevelBtn extends Phaser.GameObjects.Container {
     drawShadow() {
         this.shadow.clear();
         if (!this.shadowEnabled) return;
-        this.shadow.fillStyle(0x000000, 0.4);
+        this.shadow.fillStyle(0x000000, 1);
         this.shadow.fillRoundedRect(
             -this.btnWidth / 2,
             -this.btnHeight / 2 + this.shadowOffset,
@@ -112,15 +100,6 @@ export default class LevelBtn extends Phaser.GameObjects.Container {
                 this.radius
             );
         }
-
-        this.bg.fillStyle(0xffffff, 0.08);
-        this.bg.fillRoundedRect(
-            -this.btnWidth / 2 + 1,
-            -this.btnHeight / 2 + 1,
-            this.btnWidth - 2,
-            Math.max(4, Math.floor(this.btnHeight * 0.4)),
-            { tl: Math.max(1, this.radius - 1), tr: Math.max(1, this.radius - 1), bl: 0, br: 0 }
-        );
     }
 
     setupInteractions() {
@@ -201,22 +180,6 @@ export default class LevelBtn extends Phaser.GameObjects.Container {
         return this;
     }
 
-    setSubtitle(text) {
-        if (!this.sublabel) {
-            this.label.setY(-6);
-            this.sublabel = this.scene.add.text(0, 9, text, {
-                fontSize: "9px",
-                fontFamily: this.fontFamily,
-                color: "#94a3b8",
-                align: "center"
-            }).setOrigin(0.5, 0.5);
-            this.add(this.sublabel);
-        } else {
-            this.sublabel.setText(text);
-        }
-        return this;
-    }
-
     setDisabled(disabled) {
         this.disabled = Boolean(disabled);
         if (this.disabled) {
@@ -257,4 +220,3 @@ export function createLevelBtn(scene, x, y, text, callback, options) {
     return new LevelBtn(scene, x, y, text, callback, options);
 }
 export { LevelBtn };
-

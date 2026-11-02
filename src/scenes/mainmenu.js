@@ -13,6 +13,8 @@ export default class MainMenu extends Phaser.Scene {
         // Tilemaps and tileset
         this.load.tilemapTiledJSON("map", "assets/Tilemaps/map.tmj");
         this.load.tilemapTiledJSON("map2", "assets/Tilemaps/map2.tmj");
+        this.load.tilemapTiledJSON("map3", "assets/Tilemaps/map3.tmj");
+        this.load.tilemapTiledJSON("map4", "assets/Tilemaps/map4.tmj");
         this.load.image("tiles", "assets/Tilemaps/main.png");
 
         // Character Idle Spritesheets
@@ -49,15 +51,6 @@ export default class MainMenu extends Phaser.Scene {
 
         this.add.rectangle(width / 2, height / 2, width, height, 0x0a0f1d);
 
-        const grid = this.add.graphics();
-        grid.lineStyle(1, 0x1e293b, 0.4);
-        for (let y = 30; y < height; y += 30) {
-            grid.lineBetween(0, y, width, y);
-        }
-        for (let x = 40; x < width; x += 40) {
-            grid.lineBetween(x, 0, x, height);
-        }
-
         this.add.rectangle(width / 2, 260, width, 20, 0x0f172a);
         this.add.rectangle(width / 2, 250, width, 2, 0x38bdf8).setAlpha(0.7);
 
@@ -73,7 +66,7 @@ export default class MainMenu extends Phaser.Scene {
             fontStyle: "bold",
             color: "#38bdf8"
         }).setOrigin(0.5, 0.5);
-        title.setShadow(0, 3, "#0369a1", 4, true, true);
+        title.setShadow(2, 2, "#000000", 0);
 
         this.add.text(width / 2, 59, "STEALTH ESCAPE MISSION", {
             fontSize: "9px",
@@ -157,7 +150,7 @@ export default class MainMenu extends Phaser.Scene {
         const winY = height / 2;
 
         const winShadow = this.add.graphics();
-        winShadow.fillStyle(0x000000, 0.6);
+        winShadow.fillStyle(0x000000, 1);
         winShadow.fillRoundedRect(winX - winWidth / 2, winY - winHeight / 2 + 4, winWidth, winHeight, 8);
         modal.add(winShadow);
 

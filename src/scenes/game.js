@@ -7,6 +7,8 @@ import WinPanel from "../components/winPanel";
 import LosePanel from "../components/losePanel";
 import * as Level1Data from "../data/level1";
 import * as Level2Data from "../data/level2";
+import * as Level3Data from "../data/level3";
+import * as Level4Data from "../data/level4";
 
 export default class GameScene extends Phaser.Scene {
 
@@ -24,11 +26,25 @@ export default class GameScene extends Phaser.Scene {
     create() {
         this.isLevelFinished = false;
 
-        const levelData = this.currentLevel === 2 ? Level2Data : Level1Data;
+        let levelData = Level1Data;
+        if (this.currentLevel === 2) {
+            levelData = Level2Data;
+        } else if (this.currentLevel === 3) {
+            levelData = Level3Data;
+        } else if (this.currentLevel === 4) {
+            levelData = Level4Data;
+        }
         this.waypoints = levelData.waypoints;
         this.corridors = levelData.CORRIDORS;
 
-        const mapKey = (this.currentLevel === 2 && this.cache.tilemap.has("map2")) ? "map2" : "map";
+        let mapKey = "map";
+        if (this.currentLevel === 2 && this.cache.tilemap.has("map2")) {
+            mapKey = "map2";
+        } else if (this.currentLevel === 3 && this.cache.tilemap.has("map3")) {
+            mapKey = "map3";
+        } else if (this.currentLevel === 4 && this.cache.tilemap.has("map4")) {
+            mapKey = "map4";
+        }
         this.map = this.make.tilemap({ key: mapKey });
         const tileset = this.map.addTilesetImage("main", "tiles");
 
@@ -54,8 +70,18 @@ export default class GameScene extends Phaser.Scene {
         this.groundLayer.setCollisionFromCollisionGroup();
 
         // Spawn player
-        const spawnPlayerX = this.currentLevel === 2 ? 120 : 100;
-        const spawnPlayerY = this.currentLevel === 2 ? 80 : 30;
+        let spawnPlayerX = 100;
+        let spawnPlayerY = 30;
+        if (this.currentLevel === 2) {
+            spawnPlayerX = 120;
+            spawnPlayerY = 80;
+        } else if (this.currentLevel === 3) {
+            spawnPlayerX = 240;
+            spawnPlayerY = 660;
+        } else if (this.currentLevel === 4) {
+            spawnPlayerX = 280;
+            spawnPlayerY = 1090;
+        }
         this.player = this.physics.add.sprite(spawnPlayerX, spawnPlayerY, "player1_idle", 0);
         this.player.setCollideWorldBounds(true);
         this.player.play("player_idle", true);
@@ -69,8 +95,8 @@ export default class GameScene extends Phaser.Scene {
 
         // Spawn enemy with a delay of 1 second (1000 ms)
         this.enemy = null;
-        const spawnEnemyX = this.currentLevel === 2 ? this.waypoints.A.x : 64;
-        const spawnEnemyY = this.currentLevel === 2 ? this.waypoints.A.y - 12 : 20;
+        const spawnEnemyX = (this.currentLevel >= 2 && this.waypoints?.A) ? this.waypoints.A.x : 64;
+        const spawnEnemyY = (this.currentLevel >= 2 && this.waypoints?.A) ? (this.waypoints.A.y - 12) : 20;
 
         this.time.delayedCall(1000, () => {
             if (this.isLevelFinished || !this.scene.isActive()) return;
@@ -177,7 +203,7 @@ export default class GameScene extends Phaser.Scene {
             totalStars,
             onNextLevel: () => {
                 const nextLevel = this.currentLevel + 1;
-                if (nextLevel <= 5) {
+                if (nextLevel <= 4) {
                     this.scene.restart({ level: nextLevel });
                 } else {
                     this.scene.start("LevelScene");
@@ -212,12 +238,13 @@ export default class GameScene extends Phaser.Scene {
             (this.objectLayer && this.objectLayer.getTileAtWorldXY(px, pFeet)) ||
             (this.objectLayer && this.objectLayer.getTileAtWorldXY(px, pHead)) ||
             (this.groundLayer && this.groundLayer.getTileAtWorldXY(px, py)) ||
-            (this.groundLayer && this.groundLayer.getTileAtWorldXY(px, pFeet));
+            (this.groundLayer && this.groundLayer.getTileAtWorldXY(px, pFeet)) ||
+            (this.groundLayer && this.groundLayer.getTileAtWorldXY(px, pHead));
 
         const onLadder = Boolean(tile && (
             tile.properties?.isLadder === true ||
             tile.properties?.isLadder === "true" ||
-            [58, 59, 60].includes(tile.index)
+            [58, 59, 60, 97, 98, 99].includes(tile.index)
         ));
 
         if (onLadder) {

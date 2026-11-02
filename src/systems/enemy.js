@@ -41,7 +41,7 @@ export default class Enemy {
         return Boolean(tile && (
             tile.properties?.isLadder === true ||
             tile.properties?.isLadder === "true" ||
-            [58, 59, 60].includes(tile.index)
+            [58, 59, 60, 97, 98, 99].includes(tile.index)
         ));
     }
 
@@ -59,7 +59,16 @@ export default class Enemy {
             return true;
         }
 
-        // Shaft 1 is at x: 288..336, Shaft 2 is at x: 704..752
+        if (this.corridors) {
+            for (const corr of this.corridors) {
+                if (corr.type === "vertical") {
+                    if (Math.abs(cx - corr.x) <= 24 && cy >= corr.minY - 10 && cy <= corr.maxY + 10) {
+                        return true;
+                    }
+                }
+            }
+        }
+
         const inShaft1 = cx >= 288 && cx <= 336 && cy >= 32 && cy <= 288;
         const inShaft2 = cx >= 704 && cx <= 752 && cy >= 256 && cy <= 464;
         return inShaft1 || inShaft2;

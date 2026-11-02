@@ -2,14 +2,6 @@ import Phaser from "phaser";
 import LevelBtn from "./levelBtn";
 
 export default class LosePanel extends Phaser.GameObjects.Container {
-    /**
-     * @param {Phaser.Scene} scene 
-     * @param {object} options
-     * @param {number} [options.level=1] 
-     * @param {Function} [options.onRetry] 
-     * @param {Function} [options.onLevelSelect] 
-     * @param {Function} [options.onMainMenu] 
-     */
     constructor(scene, options = {}) {
         const cx = scene.cameras.main.width / 2;
         const cy = scene.cameras.main.height / 2;
@@ -32,7 +24,7 @@ export default class LosePanel extends Phaser.GameObjects.Container {
         const winHeight = 185;
 
         const shadow = scene.add.graphics();
-        shadow.fillStyle(0x000000, 0.5);
+        shadow.fillStyle(0x000000, 1);
         shadow.fillRoundedRect(cx - winWidth / 2, cy - winHeight / 2 + 4, winWidth, winHeight, 8);
         shadow.setScrollFactor(0);
         this.add(shadow);
@@ -51,7 +43,7 @@ export default class LosePanel extends Phaser.GameObjects.Container {
             fontStyle: "bold",
             color: "#f87171"
         }).setOrigin(0.5, 0.5).setScrollFactor(0);
-        title.setShadow(0, 2, "#7f1d1d", 4, true, true);
+        title.setShadow(2, 2, "#000000", 0);
         this.add(title);
 
         const subtitle = scene.add.text(cx, cy - 38, `Sector ${this.level} Infiltration Compromised`, {
@@ -138,4 +130,3 @@ export default class LosePanel extends Phaser.GameObjects.Container {
         });
     }
 }
-
