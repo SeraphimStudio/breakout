@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import soundManager from "../systems/soundManager";
 
 export default class LevelBtn extends Phaser.GameObjects.Container {
     constructor(scene, x, y, text, callback = () => { }, options = {}) {
@@ -157,6 +158,7 @@ export default class LevelBtn extends Phaser.GameObjects.Container {
             if (this.disabled || !this.isPressed) return;
             this.isPressed = false;
             this.drawBg(this.isHovered ? this.hoverColor : this.bgColor, this.isHovered ? this.hoverStrokeColor : this.strokeColor);
+            soundManager.playPop();
 
             this.scene.tweens.killTweensOf(this);
             this.scene.tweens.add({

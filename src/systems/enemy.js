@@ -11,21 +11,33 @@ import { waypoints, CORRIDORS } from "../data/level1";
 
 
 export default class Enemy {
-    constructor(scene, x, y, sprite = "enemy2_idle", customWaypoints = null, customCorridors = null) {
+    constructor(scene, x, y, sprite = "enemy1_idle", customWaypoints = null, customCorridors = null) {
         this.scene = scene;
         this.waypoints = customWaypoints || scene.waypoints || waypoints;
         this.corridors = customCorridors || scene.corridors || CORRIDORS;
 
+        let enemyPrefix = "enemy1";
+        if (typeof sprite === "object" && sprite?.key) {
+            enemyPrefix = sprite.key.split("_")[0];
+        } else if (typeof sprite === "string") {
+            enemyPrefix = sprite.split("_")[0];
+        }
+        this.enemyKey = enemyPrefix;
+        this.idleAnim = `${enemyPrefix}_idle`;
+        this.runAnim = `${enemyPrefix}_run`;
+        const initialSprite = (typeof sprite === "string" && sprite.includes("_")) ? sprite : this.idleAnim;
+
         const startX = x !== undefined ? x : this.waypoints.A.x;
         const startY = y !== undefined ? y : this.waypoints.A.y;
 
-        this.body = scene.physics.add.sprite(startX, startY, sprite, 0);
+        this.body = scene.physics.add.sprite(startX, startY, initialSprite, 0);
         this.body.setCollideWorldBounds(true);
         this.body.setOrigin(0, 0);
         this.body.setScale(0.75);
         this.body.setBodySize(24, 40);
         this.body.refreshBody();
         this.sprite = this.body;
+        this.body.play(this.idleAnim, true);
 
         this.speed = 80;
         this.climbSpeed = 130;
@@ -36,13 +48,29 @@ export default class Enemy {
 
     isLadderTile(x, y) {
         if (!this.scene) return false;
-        const tile = (this.scene.objectLayer && this.scene.objectLayer.getTileAtWorldXY(x, y)) ||
-            (this.scene.groundLayer && this.scene.groundLayer.getTileAtWorldXY(x, y));
-        return Boolean(tile && (
-            tile.properties?.isLadder === true ||
-            tile.properties?.isLadder === "true" ||
-            [58, 59, 60, 97, 98, 99].includes(tile.index)
-        ));
+        if (this.scene.isLadderAt) {
+            return this.scene.isLadderAt(x, y);
+        }
+
+        const objTile = this.scene.objectLayer ? this.scene.objectLayer.getTileAtWorldXY(x, y) : null;
+        if (objTile && objTile.index > 0 && (
+            objTile.properties?.isLadder === true ||
+            objTile.properties?.isLadder === "true" ||
+            [58, 59, 60].includes(objTile.index)
+        )) {
+            return true;
+        }
+
+        const gTile = this.scene.groundLayer ? this.scene.groundLayer.getTileAtWorldXY(x, y) : null;
+        if (gTile && gTile.index > 0 && (
+            gTile.properties?.isLadder === true ||
+            gTile.properties?.isLadder === "true" ||
+            [58, 59, 60, 97, 98, 99].includes(gTile.index)
+        )) {
+            return true;
+        }
+
+        return false;
     }
 
     isInLadderRegion() {
@@ -117,10 +145,10 @@ export default class Enemy {
                 if (Math.abs(dx) > 6) {
                     this.body.setVelocityX(Math.sign(dx) * this.speed);
                     this.body.setFlipX(dx < 0);
-                    this.body.play("enemy2_run", true);
+                    this.body.play(this.runAnim, true);
                 } else {
                     this.body.setVelocityX(0);
-                    this.body.play("enemy2_idle", true);
+                    this.body.play(this.idleAnim, true);
                 }
             } else if (directChase.type === "vertical") {
                 this.body.body.allowGravity = false;
@@ -136,10 +164,10 @@ export default class Enemy {
                 const dy = targetY - eY;
                 if (Math.abs(dy) > 4) {
                     this.body.setVelocityY(Math.sign(dy) * this.climbSpeed);
-                    this.body.play("enemy2_run", true);
+                    this.body.play(this.runAnim, true);
                 } else {
                     this.body.setVelocityY(0);
-                    this.body.play("enemy2_idle", true);
+                    this.body.play(this.idleAnim, true);
                 }
             }
             return;
@@ -167,7 +195,7 @@ export default class Enemy {
 
         if (!this.targetNode) {
             this.body.setVelocity(0, 0);
-            this.body.play("enemy2_idle", true);
+            this.body.play(this.idleAnim, true);
             return;
         }
 
@@ -194,7 +222,7 @@ export default class Enemy {
             } else {
                 this.body.setVelocityY(this.climbSpeed);
             }
-            this.body.play("enemy2_run", true);
+            this.body.play(this.runAnim, true);
         } else {
             this.isClimbing = false;
 
@@ -209,10 +237,10 @@ export default class Enemy {
             if (Math.abs(dx) > 4) {
                 this.body.setVelocityX(Math.sign(dx) * this.speed);
                 this.body.setFlipX(dx < 0);
-                this.body.play("enemy2_run", true);
+                this.body.play(this.runAnim, true);
             } else {
                 this.body.setVelocityX(0);
-                this.body.play("enemy2_idle", true);
+                this.body.play(this.idleAnim, true);
             }
         }
     }

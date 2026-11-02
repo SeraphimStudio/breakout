@@ -1,5 +1,7 @@
 import Phaser from "phaser";
 import LevelBtn from "../components/levelBtn";
+import OptionsPanel from "../components/optionsPanel";
+import soundManager from "../systems/soundManager";
 import createPlayerAnimations from "../animations/player";
 import createEnemyAnims from "../animations/enemies";
 
@@ -9,36 +11,10 @@ export default class MainMenu extends Phaser.Scene {
         this.activeModal = null;
     }
 
-    preload() {
-        // Tilemaps and tileset
-        this.load.tilemapTiledJSON("map", "assets/Tilemaps/map.tmj");
-        this.load.tilemapTiledJSON("map2", "assets/Tilemaps/map2.tmj");
-        this.load.tilemapTiledJSON("map3", "assets/Tilemaps/map3.tmj");
-        this.load.tilemapTiledJSON("map4", "assets/Tilemaps/map4.tmj");
-        this.load.image("tiles", "assets/Tilemaps/main.png");
-
-        // Character Idle Spritesheets
-        this.load.spritesheet("enemy1_idle", "assets/char/1/Idle.png", { frameWidth: 48, frameHeight: 48 });
-        this.load.spritesheet("player1_idle", "assets/char/2/Idle.png", { frameWidth: 48, frameHeight: 48 });
-        this.load.spritesheet("enemy2_idle", "assets/char/3/Idle.png", { frameWidth: 48, frameHeight: 48 });
-        this.load.spritesheet("enemy3_idle", "assets/char/6/Idle.png", { frameWidth: 48, frameHeight: 48 });
-        this.load.spritesheet("enemy4_idle", "assets/char/11/Idle.png", { frameWidth: 48, frameHeight: 48 });
-
-        // Character Walk Spritesheets
-        this.load.spritesheet("enemy1_walk", "assets/char/1/Walk.png", { frameWidth: 48, frameHeight: 48 });
-        this.load.spritesheet("player1_walk", "assets/char/2/Walk.png", { frameWidth: 48, frameHeight: 48 });
-        this.load.spritesheet("enemy2_walk", "assets/char/3/Walk.png", { frameWidth: 48, frameHeight: 48 });
-        this.load.spritesheet("enemy3_walk", "assets/char/6/Walk.png", { frameWidth: 48, frameHeight: 48 });
-        this.load.spritesheet("enemy4_walk", "assets/char/11/Walk.png", { frameWidth: 48, frameHeight: 48 });
-
-        // Character Special Spritesheets
-        this.load.spritesheet("enemy1_special", "assets/char/1/Special.png", { frameWidth: 48, frameHeight: 48 });
-        this.load.spritesheet("player1_special", "assets/char/2/Special.png", { frameWidth: 48, frameHeight: 48 });
-        this.load.spritesheet("enemy2_special", "assets/char/3/Special.png", { frameWidth: 48, frameHeight: 48 });
-        this.load.spritesheet("enemy3_special", "assets/char/6/Special.png", { frameWidth: 48, frameHeight: 48 });
-    }
-
     create() {
+        soundManager.init(this.sound);
+        soundManager.playMusic("bg_ost");
+
         if (!this.anims.exists("player_idle")) {
             createPlayerAnimations(this.anims);
         }
@@ -68,7 +44,7 @@ export default class MainMenu extends Phaser.Scene {
         }).setOrigin(0.5, 0.5);
         title.setShadow(2, 2, "#000000", 0);
 
-        this.add.text(width / 2, 59, "STEALTH ESCAPE MISSION", {
+        this.add.text(width / 2, 59, "CAN YOU ESCAPE?", {
             fontSize: "9px",
             fontFamily: "'Courier New', monospace",
             fontStyle: "bold",
@@ -87,10 +63,10 @@ export default class MainMenu extends Phaser.Scene {
 
         this.howToPlayBtn = new LevelBtn(this, width / 2, 132, "How to Play", () => {
             this.openModal("HOW TO PLAY", [
-                "• [LEFT / RIGHT] : Run along the corridors",
-                "• [UP] : Jump when standing on ground",
-                "• [UP / DOWN] : Climb vertical ladders",
-                "• Avoid patrolling guards & escape to safety!"
+                "• Controls: [A/D] or [Arrows] to Run • [SPACE] to Jump",
+                "• Ladders: [W/S] or [Up/Down] to climb shafts",
+                "• Objectives: Collect stars (★) & secure the exit flag",
+                "• Hazards: Evade patrol guards & avoid sharp thorns!"
             ]);
         }, {
             width: 150,
@@ -109,13 +85,8 @@ export default class MainMenu extends Phaser.Scene {
             height: 28
         });
 
-        this.feedbackBtn = new LevelBtn(this, width / 2, 204, "Feedback", () => {
-            this.openModal("FEEDBACK & COMMUNITY", [
-                "Enjoying Break Out?",
-                "We are constantly tuning patrol paths & levels.",
-                "Send your ideas, bug reports, and ratings!",
-                "Thank you for playing!"
-            ]);
+        this.optionsBtn = new LevelBtn(this, width / 2, 204, "Options", () => {
+            new OptionsPanel(this);
         }, {
             width: 150,
             height: 28

@@ -5,10 +5,13 @@ import ObstacleSystem from "../systems/obstacleSystem";
 import InputSystem from "../systems/input";
 import WinPanel from "../components/winPanel";
 import LosePanel from "../components/losePanel";
+import soundManager from "../systems/soundManager";
 import * as Level1Data from "../data/level1";
 import * as Level2Data from "../data/level2";
 import * as Level3Data from "../data/level3";
 import * as Level4Data from "../data/level4";
+import { getLevelById } from "../data/levelProvider";
+import createEnemyAnims from "../animations/enemies";
 
 export default class GameScene extends Phaser.Scene {
 
@@ -25,6 +28,16 @@ export default class GameScene extends Phaser.Scene {
 
     create() {
         this.isLevelFinished = false;
+
+        soundManager.init(this.sound);
+        soundManager.playMusic("game_ost");
+
+        if (!this.anims.exists("enemy1_idle")) {
+            createEnemyAnims(this.anims);
+        }
+
+        const levelConfig = getLevelById(this.currentLevel);
+        const enemyKey = levelConfig?.enemy || "enemy1";
 
         let levelData = Level1Data;
         if (this.currentLevel === 2) {
@@ -100,14 +113,15 @@ export default class GameScene extends Phaser.Scene {
 
         this.time.delayedCall(1000, () => {
             if (this.isLevelFinished || !this.scene.isActive()) return;
-            this.enemy = new Enemy(this, spawnEnemyX, spawnEnemyY, "enemy2_idle", this.waypoints, this.corridors);
+            this.enemy = new Enemy(this, spawnEnemyX, spawnEnemyY, enemyKey, this.waypoints, this.corridors);
             this.enemy.body.setDepth(10);
             this.physics.add.collider(this.enemy.body, this.groundLayer);
-            this.physics.add.overlap(this.player, this.enemy.body, this.handleLose, null, this);
+            this.physics.add.overlap(this.player, this.enemy.body, () => this.handleLose("enemy"), null, this);
         });
 
         this.collectSystem = new CollectSystem(this, this.collectLayer, this.player, {
             onStarCollect: () => {
+                soundManager.playPowerup();
                 this.updateHUD();
             },
             onFlagCollect: () => {
@@ -118,7 +132,7 @@ export default class GameScene extends Phaser.Scene {
         // Obstacle System for hazards (thorns)
         this.obstacleSystem = new ObstacleSystem(this, this.obstacleLayer, this.player, {
             onPlayerHitObstacle: () => {
-                this.handleLose();
+                this.handleLose("thorns");
             }
         }, this.groundLayer);
 
@@ -157,9 +171,14 @@ export default class GameScene extends Phaser.Scene {
         this.hudText.setText(`Level ${this.currentLevel} | ★ ${stars}/${total} | ESC: Levels`);
     }
 
-    handleLose() {
+    handleLose(reason = "enemy") {
+        if (typeof reason !== "string") {
+            reason = "enemy";
+        }
         if (this.isLevelFinished) return;
         this.isLevelFinished = true;
+        soundManager.playGameOver();
+        soundManager.stopMusic();
         this.player.setVelocity(0, 0);
         this.player.setTint(0xff4444);
         if (this.player.body) {
@@ -171,6 +190,7 @@ export default class GameScene extends Phaser.Scene {
         }
         new LosePanel(this, {
             level: this.currentLevel,
+            reason,
             onRetry: () => {
                 this.scene.restart({ level: this.currentLevel });
             },
@@ -186,6 +206,8 @@ export default class GameScene extends Phaser.Scene {
     handleWin() {
         if (this.isLevelFinished) return;
         this.isLevelFinished = true;
+        soundManager.stopMusic();
+        soundManager.playVictory();
 
         this.player.setVelocity(0, 0);
         this.player.setTint(0x34d399);
@@ -218,6 +240,28 @@ export default class GameScene extends Phaser.Scene {
         });
     }
 
+    isLadderAt(x, y) {
+        const objTile = this.objectLayer ? this.objectLayer.getTileAtWorldXY(x, y) : null;
+        if (objTile && objTile.index > 0 && (
+            objTile.properties?.isLadder === true ||
+            objTile.properties?.isLadder === "true" ||
+            [58, 59, 60].includes(objTile.index)
+        )) {
+            return true;
+        }
+
+        const gTile = this.groundLayer ? this.groundLayer.getTileAtWorldXY(x, y) : null;
+        if (gTile && gTile.index > 0 && (
+            gTile.properties?.isLadder === true ||
+            gTile.properties?.isLadder === "true" ||
+            [58, 59, 60, 97, 98, 99].includes(gTile.index)
+        )) {
+            return true;
+        }
+
+        return false;
+    }
+
     update(time, delta) {
         if (this.isLevelFinished) return;
 
@@ -234,18 +278,9 @@ export default class GameScene extends Phaser.Scene {
         const pFeet = this.player.body.bottom - 2;
         const pHead = this.player.body.top + 2;
 
-        const tile = (this.objectLayer && this.objectLayer.getTileAtWorldXY(px, py)) ||
-            (this.objectLayer && this.objectLayer.getTileAtWorldXY(px, pFeet)) ||
-            (this.objectLayer && this.objectLayer.getTileAtWorldXY(px, pHead)) ||
-            (this.groundLayer && this.groundLayer.getTileAtWorldXY(px, py)) ||
-            (this.groundLayer && this.groundLayer.getTileAtWorldXY(px, pFeet)) ||
-            (this.groundLayer && this.groundLayer.getTileAtWorldXY(px, pHead));
-
-        const onLadder = Boolean(tile && (
-            tile.properties?.isLadder === true ||
-            tile.properties?.isLadder === "true" ||
-            [58, 59, 60, 97, 98, 99].includes(tile.index)
-        ));
+        const onLadder = this.isLadderAt(px, py) ||
+            this.isLadderAt(px, pFeet) ||
+            this.isLadderAt(px, pHead);
 
         if (onLadder) {
             this.player.body.allowGravity = false;

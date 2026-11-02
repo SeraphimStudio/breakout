@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import BootScene from "./scenes/boot";
 import GameScene from "./scenes/game";
 import MainMenu from "./scenes/mainmenu";
 import LevelScene from "./scenes/level";
@@ -11,7 +12,7 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 200 },
-            debug: true
+            debug: false
         }
     },
     scale: {
@@ -20,6 +21,7 @@ const config = {
     },
     pixelArt: true,
     scene: [
+        BootScene,
         MainMenu,
         LevelScene,
         GameScene

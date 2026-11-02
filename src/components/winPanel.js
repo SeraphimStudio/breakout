@@ -49,7 +49,7 @@ export default class WinPanel extends Phaser.GameObjects.Container {
         title.setShadow(2, 2, "#000000", 0);
         this.add(title);
 
-        const subtitle = scene.add.text(cx, cy - 44, `Sector ${this.level} Infiltration Clear • Flag Secured`, {
+        const subtitle = scene.add.text(cx, cy - 44, `Sector ${this.level} Infiltration Clear`, {
             fontSize: "9px",
             fontFamily: "'Courier New', monospace",
             fontStyle: "bold",

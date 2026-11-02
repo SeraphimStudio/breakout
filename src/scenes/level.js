@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import LevelBtn from "../components/levelBtn";
 import BubbleText from "../components/bubbleText";
+import soundManager from "../systems/soundManager";
 
 export default class LevelScene extends Phaser.Scene {
     constructor() {
@@ -10,6 +11,9 @@ export default class LevelScene extends Phaser.Scene {
     }
 
     create() {
+        soundManager.init(this.sound);
+        soundManager.playMusic("bg_ost");
+
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 

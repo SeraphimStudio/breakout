@@ -1,3 +1,5 @@
+export const enemy = "enemy3";
+
 export const waypoints = {
     A: { x: 176, y: 672, connections: ["B"] },
     B: { x: 664, y: 672, connections: ["A", "C", "J"] },

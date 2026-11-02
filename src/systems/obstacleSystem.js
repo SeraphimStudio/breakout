@@ -117,7 +117,7 @@ export default class ObstacleSystem {
         if (typeof this.callbacks.onPlayerHitObstacle === "function") {
             this.callbacks.onPlayerHitObstacle(tile);
         } else if (this.scene && typeof this.scene.handleLose === "function") {
-            this.scene.handleLose();
+            this.scene.handleLose("thorns");
         }
     }
 

@@ -37,7 +37,17 @@ export default class LosePanel extends Phaser.GameObjects.Container {
         bg.setScrollFactor(0);
         this.add(bg);
 
-        const title = scene.add.text(cx, cy - 60, "BUSTED!", {
+        const isThorns = options.reason === "thorns" || options.reason === "hazard" || options.reason === "obstacle";
+
+        const titleString = options.title || (isThorns ? "TRAPPED!" : "BUSTED!");
+        const subtitleString = options.subtitle || (isThorns
+            ? `Sector ${this.level} Hazard Triggered`
+            : `Sector ${this.level} Infiltration Compromised`);
+        const messageString = options.message || (isThorns
+            ? "You stepped onto sharp thorns!\n Watch your step and jump over traps."
+            : "You were intercepted by the patrol unit!\n You can jump over them.");
+
+        const title = scene.add.text(cx, cy - 60, titleString, {
             fontSize: "20px",
             fontFamily: "'Trebuchet MS', 'Segoe UI', Arial, sans-serif",
             fontStyle: "bold",
@@ -46,7 +56,7 @@ export default class LosePanel extends Phaser.GameObjects.Container {
         title.setShadow(2, 2, "#000000", 0);
         this.add(title);
 
-        const subtitle = scene.add.text(cx, cy - 38, `Sector ${this.level} Infiltration Compromised`, {
+        const subtitle = scene.add.text(cx, cy - 38, subtitleString, {
             fontSize: "9px",
             fontFamily: "'Courier New', monospace",
             fontStyle: "bold",
@@ -60,7 +70,7 @@ export default class LosePanel extends Phaser.GameObjects.Container {
         sep.setScrollFactor(0);
         this.add(sep);
 
-        const messageText = scene.add.text(cx, cy + 2, "You were intercepted by the patrol unit!\nSector stars for this attempt have been cleared.", {
+        const messageText = scene.add.text(cx, cy + 2, messageString, {
             fontSize: "10px",
             fontFamily: "'Segoe UI', Arial, sans-serif",
             color: "#cbd5e1",
