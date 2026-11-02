@@ -1,13 +1,10 @@
-/**
- * CollectSystem - Manages collectible items (stars, flags) on the tilemap's "collect" layer.
- * Tracks star counts, manages Phaser registry state, and handles collision/collection logic.
- */
+
 export default class CollectSystem {
     /**
-     * @param {Phaser.Scene} scene - The active Phaser game scene.
-     * @param {Phaser.Tilemaps.TilemapLayer|null} collectLayer - Tilemap layer containing collectibles.
-     * @param {Phaser.GameObjects.Sprite} player - The player sprite.
-     * @param {object} [callbacks] - Event callbacks: { onStarCollect, onFlagCollect }.
+     * @param {Phaser.Scene} scene
+     * @param {Phaser.Tilemaps.TilemapLayer|null} collectLayer 
+     * @param {Phaser.GameObjects.Sprite} player 
+     * @param {object} [callbacks] 
      */
     constructor(scene, collectLayer, player, callbacks = {}) {
         this.scene = scene;
@@ -26,27 +23,18 @@ export default class CollectSystem {
         }
     }
 
-    /**
-     * Initializes temporary star counters in the Phaser registry.
-     */
     initRegistry() {
         if (!this.scene || !this.scene.registry) return;
         this.scene.registry.set("starsCollected", 0);
         this.scene.registry.set("totalStars", 0);
     }
 
-    /**
-     * Clears temporary star data from the Phaser registry after win/lose.
-     */
     clearRegistry() {
         if (!this.scene || !this.scene.registry) return;
         this.scene.registry.remove("starsCollected");
         this.scene.registry.remove("totalStars");
     }
 
-    /**
-     * Scans the collect layer to identify total stars.
-     */
     scanCollectibles() {
         if (!this.collectLayer) return;
         this.totalStars = 0;
@@ -62,11 +50,6 @@ export default class CollectSystem {
         }
     }
 
-    /**
-     * Determines whether a tile represents a star.
-     * @param {Phaser.Tilemaps.Tile} tile
-     * @returns {boolean}
-     */
     isStarTile(tile) {
         if (!tile || tile.index <= 0) return false;
         const props = tile.properties || {};
@@ -79,11 +62,6 @@ export default class CollectSystem {
         );
     }
 
-    /**
-     * Determines whether a tile represents a flag.
-     * @param {Phaser.Tilemaps.Tile} tile
-     * @returns {boolean}
-     */
     isFlagTile(tile) {
         if (!tile || tile.index <= 0) return false;
         const props = tile.properties || {};
@@ -98,14 +76,10 @@ export default class CollectSystem {
         );
     }
 
-    /**
-     * Checks for player overlap with collectibles during scene update.
-     */
     update(time, delta) {
         if (!this.collectLayer || !this.player || !this.player.body || this.flagCaptured) return;
 
         const body = this.player.body;
-        // Retrieve any non-empty tiles intersecting the player's bounding box
         const tiles = this.collectLayer.getTilesWithinWorldXY(
             body.x,
             body.y,
@@ -124,15 +98,10 @@ export default class CollectSystem {
         }
     }
 
-    /**
-     * Handles picking up a star tile.
-     * @param {Phaser.Tilemaps.Tile} tile
-     */
     collectStar(tile) {
         const starWorldX = tile.pixelX + 8;
         const starWorldY = tile.pixelY + 8;
 
-        // Remove the tile from the layer
         this.collectLayer.removeTileAt(tile.x, tile.y);
 
         this.starsCollected++;
@@ -140,7 +109,6 @@ export default class CollectSystem {
             this.scene.registry.set("starsCollected", this.starsCollected);
         }
 
-        // Floating pickup feedback text (+1 ★)
         this.createFloatingText(starWorldX, starWorldY, "+1 ★", "#fbbf24");
 
         if (typeof this.callbacks.onStarCollect === "function") {
@@ -148,10 +116,6 @@ export default class CollectSystem {
         }
     }
 
-    /**
-     * Handles capturing the flag (level win condition).
-     * @param {Phaser.Tilemaps.Tile} tile
-     */
     captureFlag(tile) {
         if (this.flagCaptured) return;
         this.flagCaptured = true;
@@ -166,9 +130,6 @@ export default class CollectSystem {
         }
     }
 
-    /**
-     * Spawns an animated floating text popup.
-     */
     createFloatingText(x, y, text, color = "#ffffff") {
         if (!this.scene || !this.scene.add) return;
 

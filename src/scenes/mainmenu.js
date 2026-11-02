@@ -37,7 +37,6 @@ export default class MainMenu extends Phaser.Scene {
     }
 
     create() {
-        // Safe animation creation
         if (!this.anims.exists("player_idle")) {
             createPlayerAnimations(this.anims);
         }
@@ -48,10 +47,8 @@ export default class MainMenu extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 
-        // Background
         this.add.rectangle(width / 2, height / 2, width, height, 0x0a0f1d);
 
-        // Ambient cyber accents
         const grid = this.add.graphics();
         grid.lineStyle(1, 0x1e293b, 0.4);
         for (let y = 30; y < height; y += 30) {
@@ -61,18 +58,15 @@ export default class MainMenu extends Phaser.Scene {
             grid.lineBetween(x, 0, x, height);
         }
 
-        // Floor platform
         this.add.rectangle(width / 2, 260, width, 20, 0x0f172a);
         this.add.rectangle(width / 2, 250, width, 2, 0x38bdf8).setAlpha(0.7);
 
-        // Decorative animated characters
         const playerSprite = this.add.sprite(50, 224, "player1_idle").setScale(1.15);
         playerSprite.play("player_idle");
 
         const enemySprite = this.add.sprite(430, 224, "enemy2_idle").setScale(1.15).setFlipX(true);
         enemySprite.play("enemy2_idle");
 
-        // Game Title
         const title = this.add.text(width / 2, 36, "BREAK OUT", {
             fontSize: "26px",
             fontFamily: "'Trebuchet MS', 'Segoe UI', Arial, sans-serif",
@@ -81,7 +75,6 @@ export default class MainMenu extends Phaser.Scene {
         }).setOrigin(0.5, 0.5);
         title.setShadow(0, 3, "#0369a1", 4, true, true);
 
-        // Subtitle
         this.add.text(width / 2, 59, "STEALTH ESCAPE MISSION", {
             fontSize: "9px",
             fontFamily: "'Courier New', monospace",
@@ -89,7 +82,6 @@ export default class MainMenu extends Phaser.Scene {
             color: "#94a3b8"
         }).setOrigin(0.5, 0.5);
 
-        // 1. Start Button
         this.startBtn = new LevelBtn(this, width / 2, 96, "Start", () => {
             this.scene.start("LevelScene");
         }, {
@@ -100,7 +92,6 @@ export default class MainMenu extends Phaser.Scene {
             strokeColor: 0x60a5fa
         });
 
-        // 2. Howtoplay Button
         this.howToPlayBtn = new LevelBtn(this, width / 2, 132, "How to Play", () => {
             this.openModal("HOW TO PLAY", [
                 "• [LEFT / RIGHT] : Run along the corridors",
@@ -113,7 +104,6 @@ export default class MainMenu extends Phaser.Scene {
             height: 28
         });
 
-        // 3. Achievements Button
         this.achievementsBtn = new LevelBtn(this, width / 2, 168, "Achievements", () => {
             this.openModal("ACHIEVEMENTS", [
                 "★ First Escape : Start your very first mission",
@@ -126,7 +116,6 @@ export default class MainMenu extends Phaser.Scene {
             height: 28
         });
 
-        // 4. Feedback Button
         this.feedbackBtn = new LevelBtn(this, width / 2, 204, "Feedback", () => {
             this.openModal("FEEDBACK & COMMUNITY", [
                 "Enjoying Break Out?",
@@ -139,7 +128,6 @@ export default class MainMenu extends Phaser.Scene {
             height: 28
         });
 
-        // Version info footer
         this.add.text(width / 2, 262, "v1.0.0 • Phaser 3", {
             fontSize: "8px",
             fontFamily: "monospace",
@@ -159,12 +147,10 @@ export default class MainMenu extends Phaser.Scene {
         const modal = this.add.container(0, 0).setDepth(100);
         this.activeModal = modal;
 
-        // Dim background backdrop (blocks clicks through to scene)
         const backdrop = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.75);
         backdrop.setInteractive();
         modal.add(backdrop);
 
-        // Dialog Window
         const winWidth = 350;
         const winHeight = 180;
         const winX = width / 2;
@@ -182,7 +168,6 @@ export default class MainMenu extends Phaser.Scene {
         winBg.strokeRoundedRect(winX - winWidth / 2, winY - winHeight / 2, winWidth, winHeight, 8);
         modal.add(winBg);
 
-        // Header Title
         const titleText = this.add.text(winX, winY - winHeight / 2 + 20, title, {
             fontSize: "14px",
             fontFamily: "'Trebuchet MS', Arial, sans-serif",
@@ -191,13 +176,11 @@ export default class MainMenu extends Phaser.Scene {
         }).setOrigin(0.5, 0.5);
         modal.add(titleText);
 
-        // Separator line
         const sep = this.add.graphics();
         sep.lineStyle(1, 0x334155, 1);
         sep.lineBetween(winX - winWidth / 2 + 16, winY - winHeight / 2 + 35, winX + winWidth / 2 - 16, winY - winHeight / 2 + 35);
         modal.add(sep);
 
-        // Content lines
         const bodyContent = lines.join("\n\n");
         const bodyText = this.add.text(winX, winY - 8, bodyContent, {
             fontSize: "10px",
@@ -208,7 +191,6 @@ export default class MainMenu extends Phaser.Scene {
         }).setOrigin(0.5, 0.5);
         modal.add(bodyText);
 
-        // Close button made with LevelBtn
         const closeBtn = new LevelBtn(this, winX, winY + winHeight / 2 - 22, "Close", () => {
             this.tweens.add({
                 targets: modal,
@@ -229,8 +211,6 @@ export default class MainMenu extends Phaser.Scene {
             hoverStrokeColor: 0xfbbf24
         });
         modal.add(closeBtn);
-
-        // Animate modal entry
         modal.setAlpha(0);
         this.tweens.add({
             targets: modal,

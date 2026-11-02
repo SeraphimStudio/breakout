@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import Enemy from "../systems/enemy";
 import CollectSystem from "../systems/collectSystem";
+import ObstacleSystem from "../systems/obstacleSystem";
+import InputSystem from "../systems/input";
 import WinPanel from "../components/winPanel";
 import LosePanel from "../components/losePanel";
 import * as Level1Data from "../data/level1";
@@ -34,13 +36,17 @@ export default class GameScene extends Phaser.Scene {
         this.bg = this.map.createLayer("bg", tileset, 0, 0);
         this.groundLayer = this.map.createLayer("ground", tileset, 0, 0);
         this.objectLayer = this.map.getLayer("objects") ? this.map.createLayer("objects", tileset, 0, 0) : null;
+        this.obstacleLayer = (this.map.getLayer("obstacle") || this.map.getLayer("obstacles"))
+            ? this.map.createLayer(this.map.getLayer("obstacle") ? "obstacle" : "obstacles", tileset, 0, 0)
+            : null;
         this.collectLayer = this.map.getLayer("collect") ? this.map.createLayer("collect", tileset, 0, 0) : null;
         this.enemypath = this.map.getObjectLayer("enemy_path") || this.map.getObjectLayer("ememy_path");
 
         if (this.bg) this.bg.setDepth(0);
         if (this.groundLayer) this.groundLayer.setDepth(1);
         if (this.objectLayer) this.objectLayer.setDepth(2);
-        if (this.collectLayer) this.collectLayer.setDepth(3);
+        if (this.obstacleLayer) this.obstacleLayer.setDepth(3);
+        if (this.collectLayer) this.collectLayer.setDepth(4);
 
         this.physics.world.bounds.width = this.map.widthInPixels;
         this.physics.world.bounds.height = this.map.heightInPixels;
@@ -71,12 +77,9 @@ export default class GameScene extends Phaser.Scene {
             this.enemy = new Enemy(this, spawnEnemyX, spawnEnemyY, "enemy2_idle", this.waypoints, this.corridors);
             this.enemy.body.setDepth(10);
             this.physics.add.collider(this.enemy.body, this.groundLayer);
-
-            // Lose condition: player collides with enemy
             this.physics.add.overlap(this.player, this.enemy.body, this.handleLose, null, this);
         });
 
-        // Collect System for stars and flag
         this.collectSystem = new CollectSystem(this, this.collectLayer, this.player, {
             onStarCollect: () => {
                 this.updateHUD();
@@ -86,13 +89,21 @@ export default class GameScene extends Phaser.Scene {
             }
         });
 
+        // Obstacle System for hazards (thorns)
+        this.obstacleSystem = new ObstacleSystem(this, this.obstacleLayer, this.player, {
+            onPlayerHitObstacle: () => {
+                this.handleLose();
+            }
+        }, this.groundLayer);
+
         // Camera follow
         const cam = this.cameras.main;
         cam.setZoom(1);
         cam.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
         cam.startFollow(this.player);
 
-        this.cursors = this.input.keyboard.createCursorKeys();
+        // Input system (WASD, Space, Arrow keys mapped to actions)
+        this.inputSystem = new InputSystem(this);
 
         // ESC navigation
         this.input.keyboard.on("keydown-ESC", () => {
@@ -123,23 +134,15 @@ export default class GameScene extends Phaser.Scene {
     handleLose() {
         if (this.isLevelFinished) return;
         this.isLevelFinished = true;
-
-        // Freeze player and trigger defeat feedback
         this.player.setVelocity(0, 0);
         this.player.setTint(0xff4444);
         if (this.player.body) {
             this.player.body.allowGravity = false;
         }
-
-        // Camera feedback
         this.cameras.main.shake(200, 0.01);
-
-        // Clear temporary stars in registry on defeat
         if (this.collectSystem) {
             this.collectSystem.clearRegistry();
         }
-
-        // Display Lose Overlay Panel
         new LosePanel(this, {
             level: this.currentLevel,
             onRetry: () => {
@@ -158,23 +161,16 @@ export default class GameScene extends Phaser.Scene {
         if (this.isLevelFinished) return;
         this.isLevelFinished = true;
 
-        // Freeze player and trigger victory feedback
         this.player.setVelocity(0, 0);
         this.player.setTint(0x34d399);
 
-        // Retrieve stars before clearing the temporary registry state
         const starsCollected = this.registry.get("starsCollected") || (this.collectSystem ? this.collectSystem.getStarsCount() : 0);
         const totalStars = this.registry.get("totalStars") || (this.collectSystem ? this.collectSystem.getTotalStars() : 3);
 
-        // Clear temporary registry stars after win
         if (this.collectSystem) {
             this.collectSystem.clearRegistry();
         }
-
-        // Camera celebration flash
         this.cameras.main.flash(250, 255, 255, 255);
-
-        // Display Win Overlay Panel
         new WinPanel(this, {
             level: this.currentLevel,
             starsCollected,
@@ -199,9 +195,12 @@ export default class GameScene extends Phaser.Scene {
     update(time, delta) {
         if (this.isLevelFinished) return;
 
-        // Process collectibles
         if (this.collectSystem) {
             this.collectSystem.update(time, delta);
+        }
+
+        if (this.obstacleSystem) {
+            this.obstacleSystem.update(time, delta);
         }
 
         const px = this.player.body.center.x;
@@ -223,25 +222,25 @@ export default class GameScene extends Phaser.Scene {
 
         if (onLadder) {
             this.player.body.allowGravity = false;
-            if (this.cursors.up.isDown) {
+            if (this.inputSystem.isDown("move-up")) {
                 this.player.setVelocityY(-120);
-            } else if (this.cursors.down.isDown) {
+            } else if (this.inputSystem.isDown("move-down")) {
                 this.player.setVelocityY(120);
             } else {
                 this.player.setVelocityY(0);
             }
         } else {
             this.player.body.allowGravity = true;
-            if (this.cursors.up.isDown && this.player.body.blocked.down) {
+            if (this.inputSystem.isDown("jump") && this.player.body.blocked.down) {
                 this.player.setVelocityY(-150);
             }
         }
 
-        if (this.cursors.left.isDown) {
+        if (this.inputSystem.isDown("move-left")) {
             this.player.setVelocityX(-100);
             this.player.play("player_run", true);
             this.player.setFlipX(true);
-        } else if (this.cursors.right.isDown) {
+        } else if (this.inputSystem.isDown("move-right")) {
             this.player.setVelocityX(100);
             this.player.play("player_run", true);
             this.player.setFlipX(false);

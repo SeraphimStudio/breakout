@@ -14813,6 +14813,11 @@
               "name": "isThorns",
               "type": "bool",
               "value": true
+            },
+            {
+              "name": "isThorn",
+              "type": "bool",
+              "value": true
             }
           ],
           "type": "thorns"
@@ -14846,6 +14851,11 @@
           "properties": [
             {
               "name": "isThorns",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "name": "isThorn",
               "type": "bool",
               "value": true
             }
@@ -14883,6 +14893,11 @@
               "name": "isThorns",
               "type": "bool",
               "value": true
+            },
+            {
+              "name": "isThorn",
+              "type": "bool",
+              "value": true
             }
           ],
           "type": "thorns"
@@ -14916,6 +14931,11 @@
           "properties": [
             {
               "name": "isThorns",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "name": "isThorn",
               "type": "bool",
               "value": true
             }
@@ -14953,6 +14973,11 @@
               "name": "isThorns",
               "type": "bool",
               "value": true
+            },
+            {
+              "name": "isThorn",
+              "type": "bool",
+              "value": true
             }
           ],
           "type": "thorns"
@@ -14986,6 +15011,11 @@
           "properties": [
             {
               "name": "isThorns",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "name": "isThorn",
               "type": "bool",
               "value": true
             }

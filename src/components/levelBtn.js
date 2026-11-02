@@ -113,7 +113,6 @@ export default class LevelBtn extends Phaser.GameObjects.Container {
             );
         }
 
-        // Subtle gloss highlight along the top half
         this.bg.fillStyle(0xffffff, 0.08);
         this.bg.fillRoundedRect(
             -this.btnWidth / 2 + 1,

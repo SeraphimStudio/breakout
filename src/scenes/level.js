@@ -12,10 +12,8 @@ export default class LevelScene extends Phaser.Scene {
         const width = this.cameras.main.width;
         const height = this.cameras.main.height;
 
-        // Background
         this.add.rectangle(width / 2, height / 2, width, height, 0x0a0f1d);
 
-        // Ambient cyber accents
         const grid = this.add.graphics();
         grid.lineStyle(1, 0x1e293b, 0.4);
         for (let y = 30; y < height; y += 30) {
@@ -25,7 +23,6 @@ export default class LevelScene extends Phaser.Scene {
             grid.lineBetween(x, 0, x, height);
         }
 
-        // Header Title
         const title = this.add.text(width / 2, 34, "SELECT LEVEL", {
             fontSize: "22px",
             fontFamily: "'Trebuchet MS', 'Segoe UI', Arial, sans-serif",
@@ -34,7 +31,6 @@ export default class LevelScene extends Phaser.Scene {
         }).setOrigin(0.5, 0.5);
         title.setShadow(0, 2, "#0369a1", 4, true, true);
 
-        // Subtitle
         this.add.text(width / 2, 54, "CHOOSE AN INFILTRATION SECTOR", {
             fontSize: "9px",
             fontFamily: "'Courier New', monospace",
@@ -42,12 +38,7 @@ export default class LevelScene extends Phaser.Scene {
             color: "#94a3b8"
         }).setOrigin(0.5, 0.5);
 
-        // Top accent line
         this.add.rectangle(width / 2, 68, width - 80, 1, 0x334155);
-
-        // Five Level Buttons Layout:
-        // Row 1: Level 1, Level 2, Level 3
-        // Row 2: Level 4, Level 5
         const positions = [
             { x: 110, y: 104 }, // Level 1
             { x: 240, y: 104 }, // Level 2
@@ -91,7 +82,6 @@ export default class LevelScene extends Phaser.Scene {
             this.levelBtns.push(btn);
         }
 
-        // Back to Menu Button
         this.backBtn = new LevelBtn(
             this,
             width / 2,
@@ -111,7 +101,6 @@ export default class LevelScene extends Phaser.Scene {
             }
         );
 
-        // Keyboard navigation shortcuts (1-5 to select, ESC to go back)
         this.input.keyboard.on("keydown-ESC", () => {
             this.scene.start("mainmenu");
         });
